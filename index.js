@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 const algorithm = 'aes-256-gcm';
-const ivLength = 16;
+const defaultIvLength = 16;
 const tagLength = 16;
 const defaultEncoding = 'hex';
 const defaultSaltLength = 64;
@@ -14,6 +14,7 @@ function Cryptr(secret, options) {
 
     let encoding = defaultEncoding;
     let saltLength = defaultSaltLength;
+    let ivLength = defaultIvLength;
     let pbkdf2Iterations = defaultPbkdf2Iterations;
 
     if (options) {
@@ -27,6 +28,16 @@ function Cryptr(secret, options) {
 
         if (options.saltLength) {
             saltLength = options.saltLength;
+        }
+
+        if (options.fixedIv) {
+            fixedIv = options.fixedIv;
+            ivLength = options.fixedIv.length;
+        }
+
+        if (options.fixedSalt) {
+            fixedSalt = options.fixedSalt;
+            saltLength = options.fixedSalt.length;
         }
     }
 
@@ -42,8 +53,8 @@ function Cryptr(secret, options) {
             throw new Error('value must not be null or undefined');
         }
 
-        const iv = crypto.randomBytes(ivLength);
-        const salt = crypto.randomBytes(saltLength);
+        const iv = fixedIv ? Buffer.from(fixedIv) : crypto.randomBytes(ivLength);
+        const salt = fixedSalt ? Buffer.from(fixedSalt) : crypto.randomBytes(saltLength);
 
         const key = getKey(salt);
 
