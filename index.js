@@ -16,6 +16,8 @@ function Cryptr(secret, options) {
     let saltLength = defaultSaltLength;
     let ivLength = defaultIvLength;
     let pbkdf2Iterations = defaultPbkdf2Iterations;
+    let fixedIv;
+    let fixedSalt;
 
     if (options) {
         if (options.encoding) {
